@@ -42,10 +42,10 @@ class Play extends Phaser.Scene {
         //Clock funciton below
         scoreConfig.fixedWidth = 0
 
-        this.clock = this.time.delayedCall(60000, () => { //60000 = 60 seconds
+        this.clock = this.time.delayedCall(game.settings.gameTimer, () => { //60000 = 60 seconds
             this.add.text(game.config.width/2, game.config.height/2, 'BYE BYE',
         scoreConfig).setOrigin(0.5)
-            this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to restart.',
+            this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to restart or <- for Menu.',
         scoreConfig).setOrigin(0.5)
             this.gameOver = true
         }, null, this)
@@ -56,6 +56,10 @@ class Play extends Phaser.Scene {
     update() {
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyRESET)) {
             this.scene.restart()
+        }
+
+        if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
+            this.scene.start('menuScene')
         }
         this.starfield.tilePositionX -= 5
 
@@ -105,5 +109,6 @@ class Play extends Phaser.Scene {
         })
         this.p1Score += ship.points
         this.scoreLeft.text = this.p1Score
+        this.sound.play('sfx-explosion')
     }
 }
