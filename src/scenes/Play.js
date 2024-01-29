@@ -1,10 +1,20 @@
 class Play extends Phaser.Scene {
-    constructor() {
-        super('playScene')
+    constructor(x, y) {
+        super('playScene', x, y)
     }
 
     create() {
-        this.starfield = this.add.tileSprite(0, 0, 640, 480, 'starfield').setOrigin(0,0)
+        //parallax
+       // this.game.physics.startSystem(Phaser.Physics.ARCADE)
+       // this.bgmusic = scene.sound.add('fire background music.wav')
+
+        this.starfield = this.add.tileSprite(0, 0, 1280, 960, 'starfield').setOrigin(0,0)
+
+        this.cloudsBack = this.add.tileSprite(0, 0, 1280, 960, 'blueCloud').setOrigin(0,0)
+        this.cloudsMid = this.add.tileSprite(0, 0, 1280, 960, 'pinkCloud').setOrigin(0,0)
+        this.cloudsFace = this.add.tileSprite(0, 0, 1280, 960, 'faceCloud').setOrigin(0,0)
+            
+        //borders?
         this.add.rectangle(0, borderUISize + borderPadding, game.config.width, borderUISize * 2, 0x00FF00).setOrigin(0,0)
         this.add.rectangle(0, 0, game.config.width, borderUISize, 0xFFFFFF).setOrigin(0, 0)
         this.add.rectangle(0, game.config.height - borderUISize, game.config.width, borderUISize, 0xFFFFFF).setOrigin(0, 0)
@@ -36,9 +46,10 @@ class Play extends Phaser.Scene {
             },
             fixedWidth: 100
         }
-        this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize +borderPadding*2, this.p1Score, scoreConfig)
+        this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, this.p1Score, scoreConfig)
         //GAME OVER
         this.gameOver = false
+
         //Clock funciton below
         scoreConfig.fixedWidth = 0
 
@@ -49,11 +60,20 @@ class Play extends Phaser.Scene {
         scoreConfig).setOrigin(0.5)
             this.gameOver = true
         }, null, this)
+
+        this.counter = game.settings.gameTimer
             
         }
     
 
     update() {
+       
+       //parallax movement 
+       this.cloudsBack.tilePositionX -= 0.5
+       this.cloudsMid.tilePositionX -= 1
+       this.cloudsFace.tilePositionX -= 2
+
+       //Game Over Conditionals
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyRESET)) {
             this.scene.restart()
         }
@@ -64,6 +84,7 @@ class Play extends Phaser.Scene {
         this.starfield.tilePositionX -= 5
 
         if (!this.gameOver) {
+        console.log(this.clock.elapsed)
         this.p1Rocket.update()
         this.ship01.update()
         this.ship02.update()
