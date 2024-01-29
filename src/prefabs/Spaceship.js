@@ -5,15 +5,16 @@ class Spaceship extends Phaser.GameObjects.Sprite {
         this.points = pointValue
         this.moveSpeed = game.settings.spaceshipSpeed
         
+        this.clock = this.scene.time.delayedCall(30000, () => { //60000 = 60 seconds
+            this.moveSpeed = 7
+            
+        }, null, this)
+        
         }
 
     update() {
-        if (this.scene.clock.elapsed >= 10000) {
-            this.x -= this.moveSpeed * 1.5
-        }
-        else {
-            this.x -= this.moveSpeed //constantly moving right to left
-        }
+        this.x -= this.moveSpeed //constantly moving right to left
+        
         if(this.x <= 0 - this.width) { //if ship hits the border then it resets to the right side
             this.x = game.config.width
         }

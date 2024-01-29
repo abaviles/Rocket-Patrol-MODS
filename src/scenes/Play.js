@@ -6,7 +6,9 @@ class Play extends Phaser.Scene {
     create() {
         //parallax
        // this.game.physics.startSystem(Phaser.Physics.ARCADE)
-       // this.bgmusic = scene.sound.add('fire background music.wav')
+        this.bgmusic = this.sound.add('bg-music')
+        this.bgmusic.loop = true;
+        this.bgmusic.play()
 
         this.starfield = this.add.tileSprite(0, 0, 1280, 960, 'starfield').setOrigin(0,0)
 
@@ -33,7 +35,9 @@ class Play extends Phaser.Scene {
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT)
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT)
 
+        //point tracker
         this.p1Score = 0
+
         let scoreConfig = {
             fontFamily: 'Impact',
             fontSize: '28px',
@@ -47,6 +51,8 @@ class Play extends Phaser.Scene {
             fixedWidth: 100
         }
         this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, this.p1Score, scoreConfig)
+        this.highScore = this.add.text(borderUISize + borderPadding + 1000, borderUISize + borderPadding*2, highScore, scoreConfig)
+        
         //GAME OVER
         this.gameOver = false
 
@@ -61,30 +67,39 @@ class Play extends Phaser.Scene {
             this.gameOver = true
         }, null, this)
 
-        this.counter = game.settings.gameTimer
+        //timer
+        this.timer = this.add.text(borderUISize + borderPadding  + 200 , borderUISize + borderPadding*2, this.clock.elapsed, scoreConfig)
+     
             
         }
-    
-
     update() {
        
+       this.timer.text = Math.floor((game.settings.gameTimer - this.clock.elapsed) / 1000) 
+      
        //parallax movement 
        this.cloudsBack.tilePositionX -= 0.5
        this.cloudsMid.tilePositionX -= 1
        this.cloudsFace.tilePositionX -= 2
 
+
        //Game Over Conditionals
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyRESET)) {
+            this.bgmusic.stop()
             this.scene.restart()
+            this.checkHighScore()
+            
         }
 
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
+            this.bgmusic.stop()
             this.scene.start('menuScene')
+            this.checkHighScore()
+            
         }
         this.starfield.tilePositionX -= 5
 
         if (!this.gameOver) {
-        console.log(this.clock.elapsed)
+        //console.log(this.clock.elapsed)
         this.p1Rocket.update()
         this.ship01.update()
         this.ship02.update()
@@ -129,7 +144,14 @@ class Play extends Phaser.Scene {
             boom.destroy()
         })
         this.p1Score += ship.points
+        this.clock.elapsed -= 1000 
         this.scoreLeft.text = this.p1Score
         this.sound.play('sfx-explosion')
+    }
+
+    checkHighScore() {
+        if (this.p1Score > highScore) {
+            highScore = this.p1Score
+        } 
     }
 }
