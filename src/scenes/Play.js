@@ -3,33 +3,37 @@ class Play extends Phaser.Scene {
         super('playScene', x, y)
     }
 
-    create() {
-        //parallax
-       // this.game.physics.startSystem(Phaser.Physics.ARCADE)
+    create() { //sets up stage for playing.
+       
+       //adds music, and loops it.
         this.bgmusic = this.sound.add('bg-music')
         this.bgmusic.loop = true;
         this.bgmusic.play()
 
+        //adds a tileset for the animated starfield.
         this.starfield = this.add.tileSprite(0, 0, 1280, 960, 'starfield').setOrigin(0,0)
 
+        //adds parallax assets.
         this.cloudsBack = this.add.tileSprite(0, 0, 1280, 960, 'blueCloud').setOrigin(0,0)
         this.cloudsMid = this.add.tileSprite(0, 0, 1280, 960, 'pinkCloud').setOrigin(0,0)
         this.cloudsFace = this.add.tileSprite(0, 0, 1280, 960, 'faceCloud').setOrigin(0,0)
             
-        //borders?
+        //the green bar for UI
         this.add.rectangle(0, borderUISize + borderPadding, game.config.width, borderUISize * 2, 0x00FF00).setOrigin(0,0)
+
+        //the white borders around the play space. Uses the global variables from main.js.
         this.add.rectangle(0, 0, game.config.width, borderUISize, 0xFFFFFF).setOrigin(0, 0)
         this.add.rectangle(0, game.config.height - borderUISize, game.config.width, borderUISize, 0xFFFFFF).setOrigin(0, 0)
         this.add.rectangle(0, 0, borderUISize, game.config.height, 0xFFFFFF).setOrigin(0, 0);
         this.add.rectangle(game.config.width - borderUISize, 0, borderUISize, game.config.height, 0xFFFFFF).setOrigin(0, 0)
         this.p1Rocket = new Rocket(this, game.config.width/2, game.config.height - borderUISize - borderPadding, 'rocket').setOrigin(0.5, 0)
 
-        //enemy ships
+        //enemy ships - new instances from the Spaceship.js tab. Uses (scene, x, y, texture, frame, pointValue) as a format.
         this.ship01 = new Spaceship(this, game.config.width + borderUISize*6, borderUISize*4, 'spaceship', 0, 30).setOrigin(0,0)
         this.ship02 = new Spaceship(this, game.config.width + borderUISize*3, borderUISize*5 + borderPadding*2, 'spaceship', 0, 20).setOrigin(0,0)
         this.ship03 = new Spaceship(this, game.config.width, borderUISize*6 + borderPadding*4, 'spaceship', 0, 10).setOrigin(0,0)
         
-        //defining keys
+        //defining keys - binds a key to its function.
         keyFIRE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F)
         keyRESET = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R)
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT)
@@ -67,13 +71,14 @@ class Play extends Phaser.Scene {
             this.gameOver = true
         }, null, this)
 
-        //timer
+        //timer - was able to tap into clock.elapsed to get the actual number.
         this.timer = this.add.text(borderUISize + borderPadding  + 200 , borderUISize + borderPadding*2, this.clock.elapsed, scoreConfig)
      
             
         }
     update() {
        
+        //countdown from a minute. Uses Math.floor to round to whole number.
        this.timer.text = Math.floor((game.settings.gameTimer - this.clock.elapsed) / 1000) 
       
        //parallax movement 
@@ -82,14 +87,14 @@ class Play extends Phaser.Scene {
        this.cloudsFace.tilePositionX -= 2
 
 
-       //Game Over Conditionals
+       //If "R" is pressed, it restarts the level with the same difficulty. The high score is also recorded.
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyRESET)) {
             this.bgmusic.stop()
             this.scene.restart()
             this.checkHighScore()
             
         }
-
+        //If left key pressed during a Game Over, sends player back to the main menu. The high score is also recorded.
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
             this.bgmusic.stop()
             this.scene.start('menuScene')
@@ -122,7 +127,7 @@ class Play extends Phaser.Scene {
         }
 
     }
-
+//seperate functions outside of update() for collision, explosions and high score recording. can be called in the update function even though its made after it?
     checkCollision(rocket, ship) {
         if (rocket.x < ship.x + ship.width &&
             rocket.x + rocket.width > ship.x &&

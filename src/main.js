@@ -19,13 +19,14 @@ parallax tutorial: https://www.joshmorony.com/how-to-create-a-parallax-backgroun
 music: my roomate Brian Law
 additional support: my friend Benthan Vu
 */
-let config = {
+let config = { //includes dimensions of the game and the interactable scenes.
     type: Phaser.AUTO,
     width: 1280,
     height: 960,
     scene: [Menu, Play]
 }
 
+//global variables
 let keyFIRE, keyRESET, keyLEFT, keyRIGHT
 let game = new Phaser.Game(config)
 let borderUISize = game.config.height / 15
